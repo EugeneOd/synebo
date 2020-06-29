@@ -1,7 +1,7 @@
 <template>
   <section class="gallery">
     <h1 class="gallery__title">{{ msg }}</h1>
-    <input type="text" id="search" class="gallery__input" placeholder="Search Photos" v-model="query">
+    <input type="text" id="search" class="gallery__input" placeholder="Find photos, example: flower, sun" v-model="query">
     <button @click="searchPhotos" class="gallery__btn">Search </button> 
     <div class="lds-roller" v-if="isLoading"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
     <stack
