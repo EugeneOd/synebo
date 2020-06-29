@@ -1,14 +1,25 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <input type="text" id="search" placeholder="Search Photos" v-model="query">
-    <button @click="searchPhotos">Search</button> 
-    <!-- <div id="result"></div> -->
-    <span v-if="isLoading">huy</span>
-    <div class="result__container" v-if="resultArr && resultArr.length">
-      <img :src="item.urls.regular" alt="" v-for="(item, index) in resultArr" :key="index">
-    </div>
-  </div>
+  <section class="gallery">
+    <h1 class="gallery__title">{{ msg }}</h1>
+    <input type="text" id="search" class="gallery__input" placeholder="Search Photos" v-model="query">
+    <button @click="searchPhotos" class="gallery__btn">Search </button> 
+    <div class="lds-roller" v-if="isLoading"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <stack
+              :column-min-width="300"
+              :gutter-width="15"
+              :gutter-height="15"
+              monitor-images-loaded
+      >
+        <stack-item
+                v-for="(item, index) in resultArr"
+                :key="index"
+                style="transition: transform 300ms"
+        >
+          <img :src="item.urls.small" :alt="item.alt_description" class="gallery__img"/>
+        </stack-item>
+      </stack>
+     
+  </section>
 </template>
 
 <script>
@@ -16,41 +27,47 @@
 import Vue from 'vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import { Stack, StackItem } from "vue-stack-grid";
  
 Vue.use(VueAxios, axios)
 
 
 export default {
+  
   name: 'HelloWorld',
   props: {
     msg: String
   },
+  components: { Stack, StackItem },
    data() {
     return {
       query: "",
       resultArr: [],
       myID: "JI3Cv0kZH--WLhr9PFVuiHyO5xnVubQzNswGcSP5LD8",
-      isLoading: false
+      isLoading: false,
     }
   },
   methods: {searchPhotos() {
   const promise1 = new Promise((resolve, reject) => {
-    this.isLoading = true
+   
    try{
-      const response = Vue.axios.get(`https://api.unsplash.com/search/photos?query=${this.query}&client_id=${this.myID}`)
+      const response = Vue.axios.get(`https://api.unsplash.com/search/photos?query=${this.query}&per_page=30&client_id=${this.myID}`)
     
       if(response){
-        resolve(response)
+        setTimeout(() => {
+            resolve(response)
+        }, 3000)
       }
 
     
     } catch(error){
       reject(error)
     }
-    this.isLoading = false
+    this.isLoading = true
 });
 
 promise1.then((response) => {
+     this.isLoading = false
   if(response) {
     this.resultArr = response.data.results.map(item => {
       return item
@@ -61,31 +78,8 @@ promise1.then((response) => {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style >
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-
-#result {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.img_preview {
-  width: 300px;
-  height: 300px;
-}
+<style lang="scss">
+@import "./_default.scss";
+  @import "./_HelloWorld.scss";
+  @import "./Loader.scss";
 </style>
